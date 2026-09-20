@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>惜食智慧家－校園營養午餐與廚餘減量行動</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        body { 
+            font-family: 'Noto Sans TC', sans-serif; 
+            background-color: #080c14; 
+            color: #f8fafc; 
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .nav-btn.active-tab {
+            color: #fbbf24;
+            border-bottom: 3px solid #fbbf24;
+            background-color: #22334e;
+        }
+        /* 隱藏手機版橫向滾動條 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- 頂部導覽列 Navbar (支援手機橫向滑動) -->
+    <header class="bg-[#0f172a] border-b border-slate-800 sticky top-0 z-50 shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2 lg:py-0">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <!-- 標題 Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer py-2 lg:py-4" onclick="switchTab('home')">
+                    <i class="fa-solid fa-seedling text-amber-400 text-3xl sm:text-4xl"></i>
+                    <div>
+                        <h1 class="font-extrabold text-xl sm:text-2xl text-white tracking-wide">惜食智慧家</h1>
+                        <p class="text-xs sm:text-sm text-amber-400 font-bold">正心中學 · 校園午餐廚餘減量行動</p>
+                    </div>
+                </div>
+                <!-- 跨裝置頁籤選單 -->
+                <nav class="flex overflow-x-auto whitespace-nowrap space-x-1 sm:space-x-2 py-2 lg:py-0 no-scrollbar border-t border-slate-800 lg:border-0 mt-1 lg:mt-0 text-sm sm:text-base lg:text-lg font-bold">
+                    <button onclick="switchTab('home')" class="nav-btn px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-slate-200 hover:text-amber-400 transition shrink-0 active-tab" data-tab="home">首頁</button>
+                    <button onclick="switchTab('process')" class="nav-btn px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-slate-200 hover:text-amber-400 transition shrink-0" data-tab="process">團隊與流程</button>
+                    <button onclick="switchTab('photos')" class="nav-btn px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-slate-200 hover:text-amber-400 transition shrink-0" data-tab="photos">班級紀錄與照片</button>
+                    <button onclick="switchTab('charts')" class="nav-btn px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-slate-200 hover:text-amber-400 transition shrink-0" data-tab="charts">剩食排行榜</button>
+                    <button onclick="switchTab('survey')" class="nav-btn px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-slate-200 hover:text-amber-400 transition shrink-0" data-tab="survey">問卷與訪談摘要</button>
+                    <button onclick="switchTab('compare')" class="nav-btn px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-slate-200 hover:text-amber-400 transition shrink-0" data-tab="compare">三方對照比較</button>
+                    <button onclick="switchTab('results')" class="nav-btn px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-slate-200 hover:text-amber-400 transition shrink-0" data-tab="results">結果與建議</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主體內容區塊 Main Content -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-12">
+
+        <!-- 頁籤一：首頁 -->
+        <section id="home" class="tab-content active space-y-8 sm:space-y-10">
+            <div class="space-y-4 sm:space-y-6 pt-2">
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-tight">
+                    惜食智慧家
+                </h1>
+                <p class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-amber-400">
+                    校園營養午餐與廚餘減量行動
+                </p>
+                <p class="text-lg sm:text-2xl text-slate-100 leading-relaxed font-normal max-w-4xl">
+                    我們用四週的午餐剩食紀錄，找出哪些菜最常被剩下；再用營養師訪談和同學問卷，追問它們為什麼被剩下。
+                </p>
+                
+                <!-- 大數字統計橫條 -->
+                <div class="pt-6 border-t border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 items-baseline">
+                    <div class="flex items-baseline space-x-2">
+                        <span class="text-4xl sm:text-6xl font-black text-white">19</span>
+                        <span class="text-base sm:text-xl text-slate-200 font-bold">個上課日</span>
+                    </div>
+                    <div class="flex items-baseline space-x-2">
+                        <span class="text-4xl sm:text-6xl font-black text-white">13</span>
+                        <span class="text-base sm:text-xl text-slate-200 font-bold">個班級</span>
+                    </div>
+                    <div class="flex items-baseline space-x-2">
+                        <span class="text-4xl sm:text-6xl font-black text-white">170</span>
+                        <span class="text-base sm:text-xl text-slate-200 font-bold">份問卷</span>
+                    </div>
+                    <div class="flex items-baseline space-x-2">
+                        <span class="text-4xl sm:text-6xl font-black text-white">6</span>
+                        <span class="text-base sm:text-xl text-slate-200 font-bold">段訪談</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 研究動機 -->
+            <div class="grid md:grid-cols-2 gap-5 sm:gap-8">
+                <div class="bg-[#22334e] p-5 sm:p-8 rounded-2xl border-2 border-slate-500/50 shadow-xl space-y-3">
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-amber-400 flex items-center">
+                        <i class="fa-solid fa-lightbulb mr-3"></i>我們為什麼做這件事？
+                    </h3>
+                    <p class="text-base sm:text-xl text-slate-100 leading-relaxed">
+                        雲林縣一直在推動廚餘減量，而學校午餐就是廚餘的重要來源。我們每天在學校吃午餐，最清楚哪道菜同學總是吃不完，所以想用數據找出問題，並把建議交給營養師！
+                    </p>
+                </div>
+                <div class="bg-[#22334e] p-5 sm:p-8 rounded-2xl border-2 border-slate-500/50 shadow-xl space-y-3">
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-amber-400 flex items-center">
+                        <i class="fa-solid fa-magnifying-glass mr-3"></i>我們想解答的問題
+                    </h3>
+                    <p class="text-base sm:text-xl text-slate-100 leading-relaxed">
+                        到底是哪幾道菜大家最不愛吃？原因是因為太鹹、太淡、份量太多，還是放久了變軟？光看廚餘桶不知道原因，我們要用問卷和訪談問出真話！
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 頁籤二：團隊與流程 -->
+        <section id="process" class="tab-content space-y-8 sm:space-y-10">
+            <div class="bg-[#141f32] p-5 sm:p-8 rounded-2xl border border-slate-700 shadow-2xl space-y-4">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white border-b border-slate-700 pb-3">
+                    <i class="fa-solid fa-users text-amber-400 mr-2"></i>研究團隊資料
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 text-base sm:text-xl">
+                    <div><span class="text-slate-300">學校：</span><span class="text-white font-bold">正心中學（國中組）</span></div>
+                    <div><span class="text-slate-300">指導老師：</span><span class="text-white font-bold">陳麗蘭 老師</span></div>
+                    <div><span class="text-slate-300">團隊成員：</span><span class="text-white font-bold">張湘可、廖士寬、張睿仁</span></div>
+                </div>
+            </div>
+
+            <div class="bg-[#141f32] p-5 sm:p-8 rounded-2xl border border-slate-700 shadow-2xl space-y-6">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white border-b border-slate-700 pb-3">
+                    <i class="fa-solid fa-route text-amber-400 mr-2"></i>我們的研究流程
+                </h2>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                    <div class="bg-[#22334e] p-5 rounded-xl border-2 border-amber-500/40 space-y-2 shadow-lg">
+                        <div class="text-amber-400 text-3xl font-black">01</div>
+                        <h4 class="text-xl sm:text-2xl font-bold text-white">巡班拍照片</h4>
+                        <p class="text-base text-slate-200 leading-relaxed">每天午餐後去13個班級拍照，打分數紀錄剩下多少。</p>
+                    </div>
+                    <div class="bg-[#22334e] p-5 rounded-xl border-2 border-amber-500/40 space-y-2 shadow-lg">
+                        <div class="text-amber-400 text-3xl font-black">02</div>
+                        <h4 class="text-xl sm:text-2xl font-bold text-white">AI 寫程式畫圖</h4>
+                        <p class="text-base text-slate-200 leading-relaxed">請 Claude 寫 Python 算分數，跑出剩食排行榜。</p>
+                    </div>
+                    <div class="bg-[#22334e] p-5 rounded-xl border-2 border-amber-500/40 space-y-2 shadow-lg">
+                        <div class="text-amber-400 text-3xl font-black">03</div>
+                        <h4 class="text-xl sm:text-2xl font-bold text-white">訪談與發問卷</h4>
+                        <p class="text-base text-slate-200 leading-relaxed">訪談營養師了解做法，並發問卷問170位同學感受。</p>
+                    </div>
+                    <div class="bg-[#22334e] p-5 rounded-xl border-2 border-amber-500/40 space-y-2 shadow-lg">
+                        <div class="text-amber-400 text-3xl font-black">04</div>
+                        <h4 class="text-xl sm:text-2xl font-bold text-white">對照並給建議</h4>
+                        <p class="text-base text-slate-200 leading-relaxed">結合數據、問卷與訪談，給學校最有用的改菜單建議。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 頁籤三：班級紀錄與照片 -->
+        <section id="photos" class="tab-content space-y-8 sm:space-y-10">
+            <div class="bg-[#141f32] p-5 sm:p-8 rounded-2xl border border-slate-700 shadow-2xl space-y-5">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white border-b border-slate-700 pb-3">
+                    <i class="fa-solid fa-square-check text-amber-400 mr-2"></i>剩食打分標準 (0~3分)
+                </h2>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-sm sm:text-lg font-bold">
+                    <div class="p-3 sm:p-4 bg-emerald-950/90 text-emerald-300 rounded-xl border-2 border-emerald-500 shadow-md">0分：全部吃光</div>
+                    <div class="p-3 sm:p-4 bg-amber-950/90 text-amber-300 rounded-xl border-2 border-amber-500 shadow-md">1分：剩一點點</div>
+                    <div class="p-3 sm:p-4 bg-orange-950/90 text-orange-300 rounded-xl border-2 border-orange-500 shadow-md">2分：剩在一半</div>
+                    <div class="p-3 sm:p-4 bg-rose-950/90 text-rose-300 rounded-xl border-2 border-rose-500 shadow-md">3分：剩下極多</div>
+                </div>
+            </div>
+
+            <div class="bg-[#141f32] p-5 sm:p-8 rounded-2xl border border-slate-700 shadow-2xl space-y-6">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white border-b border-slate-700 pb-3">
+                    <i class="fa-solid fa-camera text-amber-400 mr-2"></i>現場巡班記錄照片
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- 主食類觀察 -->
+                    <div class="bg-[#22334e] p-5 rounded-2xl border-2 border-amber-500/60 space-y-3 shadow-xl">
+                        <div class="h-44 sm:h-56 rounded-xl overflow-hidden border border-slate-600 grid grid-cols-2 gap-1 bg-slate-950 relative">
+                            <div class="relative w-full h-full group overflow-hidden">
+                                <span class="absolute top-2 left-2 bg-amber-600 text-white text-xs sm:text-sm font-black px-2 py-0.5 rounded z-10">炒麵剩餘</span>
+                                <img src="20260805_122121.jpg" alt="炒麵剩餘照片" class="w-full h-full object-cover">
+                            </div>
+                            <div class="relative w-full h-full group overflow-hidden">
+                                <span class="absolute top-2 left-2 bg-blue-600 text-white text-xs sm:text-sm font-black px-2 py-0.5 rounded z-10">白飯剩餘</span>
+                                <img src="20260806_121949.jpg" alt="白飯剩餘照片" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                        <h4 class="text-xl sm:text-2xl font-bold text-white">主食類觀察（炒麵 / 炒飯）</h4>
+                        <p class="text-slate-200 text-base sm:text-lg">觀察到炒飯炒麵類的剩餘份量顯著高於白飯。</p>
+                    </div>
+
+                    <!-- 招牌蒸蛋觀察 -->
+                    <div class="bg-[#22334e] p-5 rounded-2xl border-2 border-amber-500/60 space-y-3 shadow-xl">
+                        <div class="h-44 sm:h-56 rounded-xl overflow-hidden border border-slate-600 grid grid-cols-2 gap-1 bg-slate-950 relative">
+                            <div class="relative w-full h-full group overflow-hidden">
+                                <span class="absolute top-2 left-2 bg-amber-600 text-white text-xs sm:text-sm font-black px-2 py-0.5 rounded z-10">302班 蒸蛋剩餘</span>
+                                <img src="1000014010.jpg" alt="302班蒸蛋剩餘照片" class="w-full h-full object-cover">
+                            </div>
+                            <div class="relative w-full h-full group overflow-hidden">
+                                <span class="absolute top-2 left-2 bg-amber-600 text-white text-xs sm:text-sm font-black px-2 py-0.5 rounded z-10">303班 蒸蛋剩餘</span>
+                                <img src="1000014009.jpg" alt="303班蒸蛋剩餘照片" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                        <h4 class="text-xl sm:text-2xl font-bold text-white">招牌蒸蛋觀察</h4>
+                        <p class="text-slate-200 text-base sm:text-lg">蒸蛋當天的剩量高達 2.81 分，幾乎快整桶沒動。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 頁籤四：剩食排行榜 -->
+        <section id="charts" class="tab-content space-y-8 sm:space-y-10">
+            <div class="bg-[#141f32] p-5 sm:p-8 rounded-2xl border border-slate-700 shadow-2xl space-y-6">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white border-b border-slate-700 pb-3">
+                    <i class="fa-solid fa-chart-simple text-amber-400 mr-2"></i>五大類菜色平均剩食分數
+                </h2>
+                <div class="h-64 sm:h-80 w-full">
+                    <canvas id="slotChart"></canvas>
+                </div>
+                <p class="text-base sm:text-lg text-amber-300 text-center font-bold bg-[#22334e] p-4 rounded-xl border-2 border-amber-500/50">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i>分析結果：<strong>主食類（炒飯、炒麵、雜糧飯等）平均剩食 2.08 分</strong>，高居第一！
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 sm:gap-8">
+                <!-- 最常剩下的菜 -->
+                <div class="bg-[#141f32] p-5 sm:p-8 rounded-2xl border border-slate-700 shadow-2xl space-y-4">
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-rose-400 border-b border-slate-700 pb-3 flex items-center">
+                        <i class="fa-solid fa-thumbs-down mr-2"></i>最常剩下的菜 Top 10
+                    </h3>
+                    <div class="space-y-2 text-base sm:text-lg font-medium">
+                        <div class="flex justify-between p-3 bg-rose-950/80 rounded-xl border-2 border-rose-600 font-bold text-white">
+                            <span>1. 正心招牌蒸蛋</span>
+                            <span class="text-rose-400">2.81 分</span>
+                        </div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>2. 鹹水雞</span><span class="text-rose-400 font-bold">2.77 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>3. 肉絲炒麵</span><span class="text-rose-400 font-bold">2.73 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>4. 地瓜飯</span><span class="text-rose-400 font-bold">2.64 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>5. 肉絲炒飯</span><span class="text-rose-400 font-bold">2.60 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>6. 台式炒粄條</span><span class="text-rose-400 font-bold">2.58 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>7. 五穀飯</span><span class="text-rose-400 font-bold">2.54 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>8. 香炒雙絲</span><span class="text-rose-400 font-bold">2.42 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>9. 紫米飯</span><span class="text-rose-400 font-bold">2.31 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>10. 烤雞</span><span class="text-rose-400 font-bold">2.18 分</span></div>
+                    </div>
+                </div>
+
+                <!-- 最受歡迎的菜 -->
+                <div class="bg-[#141f32] p-5 sm:p-8 rounded-2xl border border-slate-700 shadow-2xl space-y-4">
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-emerald-400 border-b border-slate-700 pb-3 flex items-center">
+                        <i class="fa-solid fa-thumbs-up mr-2"></i>最受歡迎、吃最乾淨 Top 10
+                    </h3>
+                    <div class="space-y-2 text-base sm:text-lg font-medium">
+                        <div class="flex justify-between p-3 bg-emerald-950/80 rounded-xl border-2 border-emerald-600 font-bold text-white">
+                            <span>1. 蜜汁四分干</span>
+                            <span class="text-emerald-400">0.08 分</span>
+                        </div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>2. 煉乳炸饅頭(炸)</span><span class="text-emerald-400 font-bold">0.08 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>3. 水煎包</span><span class="text-emerald-400 font-bold">0.18 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>4. 香酥雞翅(炸)</span><span class="text-emerald-400 font-bold">0.23 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>5. 滷蛋肉燥</span><span class="text-emerald-400 font-bold">0.23 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>6. 燒烤雞腿</span><span class="text-emerald-400 font-bold">0.30 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>7. 烤鴨</span><span class="text-emerald-400 font-bold">0.36 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>8. 鴨血豆腐煲</span><span class="text-emerald-400 font-bold">0.57 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>9. 蔥燒肉片</span><span class="text-emerald-400 font-bold">0.60 分</span></div>
+                        <div class="flex justify-between p-3 bg-[#22334e] rounded-xl border border-slate-500/50 text-slate-100"><span>10. 珍珠甜湯</span><span class="text-emerald-400 font-bold">0.63 分</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 頁籤五：問卷與訪談摘要 -->
+        <section id="survey" class="tab-content space-y-8 sm:space-y-10">
+            <!-- 問卷結果摘要 -->
+            <div class="bg-[#141f32] p-5 sm:p-8 rounded-2xl border border-slate-700 shadow-2xl space-y-6">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white border-b border-slate-700 pb-3 flex items-center">
+                    <i class="fa-solid fa-clipboard-list text-amber-400 mr-2"></i>問卷結果摘要（170 份有效問卷）
+                </h2>
+                <div class="grid sm:grid-cols-2 gap-5 sm:gap-8">
+                    <div class="bg-[#22334e] p-5 sm:p-8 rounded-2xl border-2 border-amber-500/50 shadow-xl space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-4xl sm:text-5xl font-black text-amber-400">69%</span>
+                            <span class="text-xl sm:text-2xl font-bold text-white">同學認同主食問題</span>
+                        </div>
+                        <p class="text-slate-100 text-base sm:text-lg leading-relaxed">
+                            多數同學反應「炒飯、炒麵類比一般白飯更容易剩下一大半」，主因是放久了口感變軟乾，或是調味不夠均勻。
+                        </p>
+                    </div>
+                    <div class="bg-[#22334e] p-5 sm:p-8 rounded-2xl border-2 border-amber-500/50 shadow-xl space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-4xl sm:text-5xl font-black text-amber-400">64%</span>
+                            <span class="text-xl sm:text-2xl font-bold text-white">同學偏好酥脆調味</span>
+                        </div>
+                        <p class="text-slate-100 text-base sm:text-lg leading-relaxed">
+                            炸物類（如炸雞翅、炸饅頭）幾乎每次都秒殺完食，主要原因是「口感香脆、香氣十足、味道夠重」。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 訪談結果摘要 -->
+            <div class="bg-[#141f32] p-5 sm:p-8 rounded-2xl border border-slate-700 shadow-2xl space-y-6">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white border-b border-slate-700 pb-3 flex items-center">
+                    <i class="fa-solid fa-user-doctor text-amber-400 mr-2"></i>訪談結果摘要（營養師解答）
+                </h2>
+                <div class="grid sm:grid-cols-2 gap-5 sm:gap-6 text-base sm:text-lg">
+                    <div class="bg-[#22334e] p-5 sm:p-6 rounded-2xl border-2 border-slate-500/50 shadow-xl space-y-2">
+                        <h4 class="text-xl font-bold text-amber-400 flex items-center">
+                            <i class="fa-solid fa-circle-question mr-2"></i>蒸蛋為什麼突然被剩下？
+                        </h4>
+                        <p class="text-slate-100 leading-relaxed">
+                            蒸蛋平時很受歡迎！但若當天主菜口味重（如滷肉），廚房會特意把蒸蛋調淡，結果反而讓大家覺得沒味道而不愛吃。
+                        </p>
+                    </div>
+                    <div class="bg-[#22334e] p-5 sm:p-6 rounded-2xl border-2 border-slate-500/50 shadow-xl space-y-2">
+                        <h4 class="text-xl font-bold text-amber-400 flex items-center">
+                            <i class="fa-solid fa-circle-question mr-2"></i>炒麵為什麼總是剩下很多？
+                        </h4>
+                        <p class="text-slate-100 leading-relaxed">
+                            大鍋炒麵很難像小吃店大火快炒出香味，加上保溫過程中麵條容易吸水膨脹變軟，口感影響了食慾。
+                        </p>
+                    </div>
+                    <div class="bg-[#22334e] p-5 sm:p-6 rounded-2xl border-2 border-slate-500/50 shadow-xl space-y-2">
+                        <h4 class="text-xl font-bold text-amber-400 flex items-center">
+                            <i class="fa-solid fa-circle-question mr-2"></i>雜糧飯不得不煮？
+                        </h4>
+                        <p class="text-slate-100 leading-relaxed">
+                            教育部規範每週要有 1/3 全穀雜糧，但學生接受度較低。學校已設法調低比例，盡力在健康與口味間平衡。
+                        </p>
+                    </div>
+                    <div class="bg-[#22334e] p-5 sm:p-6 rounded-2xl border-2 border-slate-500/50 shadow-xl space-y-2">
+                        <h4 class="text-xl font-bold text-amber-400 flex items-center">
+                            <i class="fa-solid fa-circle-question mr-2"></i>炸物好吃但不能常做？
+                        </h4>
+                        <p class="text-slate-100 leading-relaxed">
+                            為了健康不能頻繁油炸。營養師正規劃用「人氣醬汁」（如咖哩、茄汁）來烹調肉品，創造不輸炸物的美味。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 頁籤六：三方對照比較 -->
+        <section id="compare" class="tab-content space-y-8 sm:space-y-10">
+            <div class="bg-[#141f32] p-5 sm:p-8 rounded-2xl border border-slate-700 shadow-2xl space-y-6">
+                <div class="border-b border-slate-700 pb-4">
+                    <h2 class="text-2xl sm:text-4xl font-black text-white flex items-center">
+                        <i class="fa-solid fa-code-compare text-amber-400 mr-3"></i>三方交叉對照比較
+                    </h2>
+                    <p class="text-base sm:text-xl text-slate-200 mt-2 leading-relaxed">
+                        結合 <span class="text-amber-400 font-bold">AI 數據統計</span> × <span class="text-sky-400 font-bold">同學問卷心聲</span> × <span class="text-emerald-400 font-bold">營養師訪談解答</span>，深度剖析剩食原因：
+                    </p>
+                </div>
+
+                <div class="space-y-6 sm:space-y-8">
+                    <!-- 對照 1 -->
+                    <div class="bg-[#1e2d42] p-5 sm:p-8 rounded-2xl border-2 border-slate-600 shadow-xl space-y-4">
+                        <div class="flex items-center space-x-2 border-b border-slate-600 pb-3">
+                            <span class="px-3 py-1 bg-rose-900/90 text-rose-100 font-bold rounded-lg text-xs sm:text-sm border border-rose-500">案例 1</span>
+                            <h3 class="text-xl sm:text-2xl font-extrabold text-white">正心招牌蒸蛋（剩食 2.81 分）</h3>
+                        </div>
+                        <div class="grid md:grid-cols-3 gap-4 text-base sm:text-lg">
+                            <div class="bg-[#263a58] p-4 sm:p-5 rounded-xl border border-amber-500/40 space-y-2">
+                                <p class="text-amber-400 font-bold flex items-center"><i class="fa-solid fa-robot mr-2"></i> AI 剩食圖數據</p>
+                                <p class="text-slate-100 leading-relaxed">蒸蛋剩食分數高達 2.81 分，當天幾乎快整桶沒動。</p>
+                            </div>
+                            <div class="bg-[#263a58] p-4 sm:p-5 rounded-xl border border-sky-500/40 space-y-2">
+                                <p class="text-sky-400 font-bold flex items-center"><i class="fa-solid fa-users mr-2"></i> 同學問卷心聲</p>
+                                <p class="text-slate-100 leading-relaxed">同學抱怨當天蒸蛋完全沒有鹹味與香氣，像在吃水。</p>
+                            </div>
+                            <div class="bg-[#263a58] p-4 sm:p-5 rounded-xl border border-emerald-500/40 space-y-2">
+                                <p class="text-emerald-400 font-bold flex items-center"><i class="fa-solid fa-user-doctor mr-2"></i> 營養師訪談解答</p>
+                                <p class="text-slate-100 leading-relaxed">主菜配了重口味滷肉，廚房刻意將蒸蛋減鹽，卻弄巧成拙。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 對照 2 -->
+                    <div class="bg-[#1e2d42] p-5 sm:p-8 rounded-2xl border-2 border-slate-600 shadow-xl space-y-4">
+                        <div class="flex items-center space-x-2 border-b border-slate-600 pb-3">
+                            <span class="px-3 py-1 bg-rose-900/90 text-rose-100 font-bold rounded-lg text-xs sm:text-sm border border-rose-500">案例 2</span>
+                            <h3 class="text-xl sm:text-2xl font-extrabold text-white">炒麵與炒飯類（平均剩食 2.08 分）</h3>
+                        </div>
+                        <div class="grid md:grid-cols-3 gap-4 text-base sm:text-lg">
+                            <div class="bg-[#263a58] p-4 sm:p-5 rounded-xl border border-amber-500/40 space-y-2">
+                                <p class="text-amber-400 font-bold flex items-center"><i class="fa-solid fa-robot mr-2"></i> AI 剩食圖數據</p>
+                                <p class="text-slate-100 leading-relaxed">主食類總體剩食分數最高，肉絲炒麵高達 2.73 分。</p>
+                            </div>
+                            <div class="bg-[#263a58] p-4 sm:p-5 rounded-xl border border-sky-500/40 space-y-2">
+                                <p class="text-sky-400 font-bold flex items-center"><i class="fa-solid fa-users mr-2"></i> 同學問卷心聲</p>
+                                <p class="text-slate-100 leading-relaxed">69% 同學認同炒麵剩更多，覺得麵條太黏太軟缺少香氣。</p>
+                            </div>
+                            <div class="bg-[#263a58] p-4 sm:p-5 rounded-xl border border-emerald-500/40 space-y-2">
+                                <p class="text-emerald-400 font-bold flex items-center"><i class="fa-solid fa-user-doctor mr-2"></i> 營養師訪談解答</p>
+                                <p class="text-slate-100 leading-relaxed">大鍋炒難呈現小炒香味，長時間蒸氣保溫讓麵條吸水軟爛。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 頁籤七：結果與建議 -->
+        <section id="results" class="tab-content space-y-8 sm:space-y-10">
+            <div class="bg-[#141f32] p-5 sm:p-8 rounded-2xl border border-slate-700 shadow-2xl space-y-4">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white border-b border-slate-700 pb-3">
+                    <i class="fa-solid fa-bullseye text-amber-400 mr-2"></i>研究結論：三方驗證成果
+                </h2>
+                <p class="text-base sm:text-xl text-slate-100 leading-relaxed">
+                    我們建立了一套完整驗證流程：<strong>AI 找到「什麼菜被剩下」 → 同學問卷反映「真實口感問題」 → 訪談營養師找出「烹調與法規限制」</strong>，成功為學校提出了科學且務實的改進方向！
+                </p>
+            </div>
+
+            <div class="bg-[#141f32] p-5 sm:p-8 rounded-2xl border-2 border-amber-500/50 shadow-2xl space-y-6">
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-400 border-b border-slate-700 pb-3">
+                    <i class="fa-solid fa-hand-holding-heart mr-2"></i>給學校菜單的減量建議
+                </h2>
+                <div class="space-y-4 text-base sm:text-xl">
+                    <div class="p-5 sm:p-6 bg-[#22334e] rounded-xl border border-slate-500/50 space-y-2">
+                        <h4 class="font-extrabold text-white text-lg sm:text-2xl">1. 改進主食保溫與雜糧搭法</h4>
+                        <p class="text-slate-200 leading-relaxed">炒麵改進保溫透氣，避免麵條軟爛；雜糧飯可搭配同學喜歡的醬汁飯，提高接受度。</p>
+                    </div>
+                    <div class="p-5 sm:p-6 bg-[#22334e] rounded-xl border border-slate-500/50 space-y-2">
+                        <h4 class="font-extrabold text-white text-lg sm:text-2xl">2. 配菜調味與主菜整體搭配</h4>
+                        <p class="text-slate-200 leading-relaxed">蒸蛋等人氣配菜即使配合重口味主菜，也應保持基本香氣與鹹度，避免口感流失。</p>
+                    </div>
+                    <div class="p-5 sm:p-6 bg-[#22334e] rounded-xl border border-slate-500/50 space-y-2">
+                        <h4 class="font-extrabold text-white text-lg sm:text-2xl">3. 開發人氣醬汁替代油炸</h4>
+                        <p class="text-slate-200 leading-relaxed">多善用咖哩、茄汁等深受歡迎的醬汁烹調非油炸肉品，既健康又能大幅減少剩食！</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 Footer -->
+    <footer class="bg-[#0f172a] text-slate-300 text-sm sm:text-base py-8 border-t border-slate-800 mt-12 shadow-2xl">
+        <div class="max-w-6xl mx-auto px-4 text-center space-y-2">
+            <p class="text-white font-bold text-base sm:text-lg">惜食智慧家－校園營養午餐與廚餘減量行動</p>
+            <p class="text-slate-400">正心中學 國中組團隊｜指導老師：陳麗蘭｜隊員：張湘可、廖士寬、張睿仁</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript 切換與圖表邏輯 -->
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active-tab');
+            });
+
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+
+            const activeBtn = document.querySelector(`.nav-btn[data-tab="${tabId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active-tab');
+                // 自動置中被點擊的手機頁籤
+                activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+
+            if (tabId === 'charts') {
+                renderChart();
+            }
+        }
+
+        let chartRendered = false;
+        function renderChart() {
+            if (chartRendered) return;
+            chartRendered = true;
+
+            const ctx = document.getElementById('slotChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['主食類', '副菜二', '副菜一', '湯品', '主菜'],
+                    datasets: [{
+                        label: '平均剩食分數 (0~3分)',
+                        data: [2.08, 1.50, 1.34, 1.14, 1.12],
+                        backgroundColor: [
+                            '#f43f5e',
+                            '#fb923c',
+                            '#fb923c',
+                            '#34d399',
+                            '#34d399'
+                        ],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#f8fafc', font: { size: 14, weight: 'bold' } } }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 3,
+                            ticks: { color: '#cbd5e1', font: { size: 12 } },
+                            grid: { color: '#334155' }
+                        },
+                        x: {
+                            ticks: { color: '#f8fafc', font: { size: 14, weight: 'bold' } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
